@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Aug  5 09:31:48 2022
+@author: toulsie
+"""
+
+#importing libraries
+from sklearn.datasets import load_boston
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Path for CSV file with Pyradiomics features
+data = pd.read_csv("/Users/toulsie/Desktop/cohorte_HER2LOW.csv", sep=';')
+X=data
+Y= data
+X.corr()
+
+#Using Pearson Correlation
+plt.figure(figsize=(24,20))
+cor = X.corr()
+sns.heatmap(cor, annot=False, cmap="coolwarm", center=0)
+plt.show()
+
+def correlation(dataset, threshold):
+    col_corr = set()  # Set of all the names of correlated columns
+    corr_matrix = dataset.corr()
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i):
+            if abs(corr_matrix.iloc[i, j]) > threshold: # for absolute coeff value
+                colname = corr_matrix.columns[i]  # getting the name of column
+                col_corr.add(colname)
+    return col_corr
+
+# Set the Pearson correlation coefficient
+corr_features = correlation(X, 0.8)
+len(set(corr_features))
+corr_features
+X_drop=X.drop(corr_features,axis=1) # Drop features not highly correlated with each other
+plt.figure(figsize=(24,20))
+cor = X_drop.corr()
+sns.heatmap(cor, annot=False, cmap="coolwarm", center=0)
+plt.show()
+
+# Save only features with the Pearson correlation coefficient < optimal cutoff
+X_drop.to_csv("/Users/toulsie/Desktop/myfiles/X_drop.csv", decimal=',', float_format='%.5f')
